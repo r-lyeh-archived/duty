@@ -66,7 +66,7 @@ namespace duty
 /* public tasks API */
 namespace duty
 {
-    typedef std::function<bool(void)> task;
+    typedef std::function<bool (void)> task;
 
     struct status
     {
@@ -106,20 +106,20 @@ namespace duty
         bool operator()();
 
         template<typename T>
-        inline tasks &operator=( T &t ) {
+        inline tasks &operator=( const T &t ) {
             this->clear();
             this->push_back( t );
             return *this;
         }
 
         template<typename T>
-        inline tasks &operator+=( T &t ) {
+        inline tasks &operator+=( const T &t ) {
             this->push_back( t );
             return *this;
         }
 
         template<typename T>
-        inline tasks &operator<<( T &t ) {
+        inline tasks &operator<<( const T &t ) {
             this->push_back( t );
             return *this;
         }

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <thread>
+#include <chrono>
 
 #include "duty.hpp"
 
@@ -23,7 +24,10 @@ void signals() {
 
 int main( int argc, const char **argv )
 {
-    std::thread t1(waits), t2(waits), t3(waits), t4(signals);
+    std::thread t1(waits), t2(waits), t3(waits);
+
+    std::this_thread::sleep_for( std::chrono::milliseconds(500) );
+    std::thread t4(signals);
 
     t1.join();
     t2.join();

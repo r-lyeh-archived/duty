@@ -16,6 +16,7 @@
 #if defined( _WIN32 )
 #   include <Windows.h>
 #else
+#   include <unistd.h>
 #   include <sys/time.h>
 #endif
 
@@ -43,13 +44,14 @@ namespace
             if( cvm ) delete cvm, cvm = 0;
         }
 
-        coroutine( coroutine &s )
+        coroutine( const coroutine &s )
         {
             cv = s.cv;
             cvm = s.cvm;
             owner = true;
 
-            s.owner = false;
+            //s.owner = false;
+            ( const_cast< coroutine & >(s) ).owner = false;
         }
 
         void wait()
@@ -72,13 +74,13 @@ namespace
         }
     };
 
-    std::map< std::string, coroutine > signals;
+    std::map< std::string, coroutine > coroutines;
 
     void notify_exit()
     {
         closing = true;
 
-        for( auto &it : signals )
+        for( auto &it : coroutines )
         {
             /*
             std::stringstream ss;
@@ -98,64 +100,64 @@ namespace duty
     {
         std::stringstream ss;
         if( ss << t )
-            ::signals[ ss.str() ].wait();
+            coroutines[ ss.str() ].wait();
     }
     void wait( const size_t &t )
     {
         std::stringstream ss;
         if( ss << t )
-            ::signals[ ss.str() ].wait();
+            coroutines[ ss.str() ].wait();
     }
     void wait( const std::string &t )
     {
         std::stringstream ss;
         if( ss << t )
-            ::signals[ ss.str() ].wait();
+            coroutines[ ss.str() ].wait();
     }
 
     void single_signal( const int &t )
     {
         std::stringstream ss;
         if( ss << t )
-            ::signals[ ss.str() ].single_signal();
+            coroutines[ ss.str() ].single_signal();
     }
     void single_signal( const size_t &t )
     {
         std::stringstream ss;
         if( ss << t )
-            ::signals[ ss.str() ].single_signal();
+            coroutines[ ss.str() ].single_signal();
     }
     void single_signal( const std::string &t )
     {
         std::stringstream ss;
         if( ss << t )
-            ::signals[ ss.str() ].single_signal();
+            coroutines[ ss.str() ].single_signal();
     }
 
     void signal( const int &t )
     {
         std::stringstream ss;
         if( ss << t )
-            ::signals[ ss.str() ].signal();
+            coroutines[ ss.str() ].signal();
     }
     void signal( const size_t &t )
     {
         std::stringstream ss;
         if( ss << t )
-            ::signals[ ss.str() ].signal();
+            coroutines[ ss.str() ].signal();
     }
     void signal( const std::string &t )
     {
         std::stringstream ss;
         if( ss << t )
-            ::signals[ ss.str() ].signal();
+            coroutines[ ss.str() ].signal();
     }
 
     void signals()
     {
         closing = true;
 
-        for( auto &it : ::signals )
+        for( auto &it : coroutines )
             it.second.signal();
 
         closing = false;
@@ -346,7 +348,9 @@ bool tasks::sync() {
     try {
         float progress_inc = this->empty() ? 0.f : 100.f / this->size();
 
-        for( auto &it : *this ) {
+        for( tasks::const_iterator
+                in = this->begin(), end = this->end(); in != end; ++in ) {
+            auto &it = *in;
             bool is_ok = ( it == nullptr || it() );
 
             status.progress += progress_inc;
