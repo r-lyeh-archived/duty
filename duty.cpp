@@ -281,7 +281,8 @@ status::status() {
 
 void status::clear() {
     taken = 0;
-    begin = end = eta = 0;
+    begin = end = 0;
+    eta = 0;
     has_started = has_finished = has_suceeded = has_crashed = 0;
     progress = 0;
     exitcode = 0;
@@ -313,7 +314,7 @@ std::string status::graph() const {
     std::stringstream ss;
 
     // progress: width 100 stretched to 20 (100/5)
-    ss << '[' << std::string(progress / 5, '=') << std::string(20 - ( progress / 5 ), '.') << ']';
+    ss << '[' << std::string(int(progress / 5), '=') << std::string(20 - int(progress / 5), '.') << ']';
     if( !has_started ) {
         ss << "(idle)";
     } else {
@@ -339,7 +340,7 @@ bool tasks::sync() {
     double start = duty::now();
 
     status.clear();
-    status.begin = std::time(0);
+    status.begin = (unsigned)std::time(0);
     status.has_started = true;
 
     if( verbose )
@@ -378,7 +379,7 @@ bool tasks::sync() {
         //@todo callstack
     }
 
-    status.end = std::time(0);
+    status.end = (unsigned)std::time(0);
     status.taken = duty::now() - start;
     status.has_suceeded = status.exitcode < 300 && (!status.has_crashed);
     status.has_finished = true;
