@@ -1,5 +1,5 @@
-// Duty is a lightweight C++11 task manager for parallel coroutines and serial jobs. ZLIB/LibPNG licensed
-// - rlyeh
+// Duty is a lightweight C++11 task manager for parallel coroutines and serial jobs
+// - rlyeh, zlib/libpng licensed
 
 // duty graph map
 // +---> serial jobs (tasks)
